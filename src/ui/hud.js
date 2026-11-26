@@ -15,18 +15,41 @@ export class HUD {
   constructor(engine) {
     this.engine = engine;
     this.$ = (id) => document.getElementById(id);
+    this._buildRestartButton();
     this._buildSpeedButtons();
     this._bindJumpButtons();
     bus.on(EV.SPEED_CHANGED, ({ mult, auto }) => {
       this.$("clock-speed").textContent = auto ? "AUTO" : formatSpeed(mult);
-      const yrPerSec = mult;
-      this.$("clock-note").textContent =
-        mult >= 1 ? `${trim(yrPerSec * 3.15576e7 / 3.15576e7, 4)}× — 1 s = ${formatTime(mult)}` : "slow motion through the Planck era";
+      this.$("clock-note").textContent = mult >= 1
+        ? `1 s = ${formatTime(mult)} of universe time`
+        : "slow motion — Planck era";
     });
     this.$("auto-speed").addEventListener("change", (e) => {
       if (e.target.checked) this.engine.clock.setSpeed(this.engine.clock.speed, true);
       else this.engine.clock.setSpeed(this.engine.clock.speed, false);
     });
+  }
+
+  /** ⟲ RESTART — rewind the universe to the singularity (t = 0). */
+  _buildRestartButton() {
+    const btn = document.createElement("button");
+    btn.id = "restart-btn";
+    btn.textContent = "⟲ RESTART · SINGULARITY";
+    btn.title = "Rewind to t = 0 and replay the whole universe";
+    btn.addEventListener("click", () => {
+      const clock = this.engine.clock;
+      clock.paused = false;
+      clock.auto = true;
+      const autoChk = this.$("auto-speed");
+      if (autoChk) autoChk.checked = true;
+      document.querySelectorAll("#speed-buttons button").forEach(b => b.classList.remove("active"));
+      clock.jumpTo(0);                    // t = 0 → Planck epoch
+      bus.emit(EV.RESTART, {});           // camera + realm reset (main.js)
+      this.$("clock-speed").textContent = "AUTO";
+      this.$("clock-note").textContent = "t = 0 — replaying from the singularity";
+    });
+    const clockbox = this.$("clockbox");
+    clockbox.insertBefore(btn, this.$("speed-buttons"));
   }
 
   _buildSpeedButtons() {

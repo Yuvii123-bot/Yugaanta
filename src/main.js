@@ -78,6 +78,9 @@ async function boot() {
     dist: 220, minDist: 1, maxDist: 400,
     onPick: (e, isDouble) => handlePick(e, isDouble),
   });
+  document.getElementById("invert-zoom").addEventListener("change", (e) => {
+    controls.setInvertZoom(e.target.checked);
+  });
 
   // Realm manager + views
   const realms = new RealmManager(scene, engine, controls, labels);
@@ -139,6 +142,22 @@ async function boot() {
   });
   realms._refreshRealmUI();
 
+  // Side-panel toggle (prevents overlap on smaller screens)
+  const sideToggle = document.getElementById("side-toggle");
+  sideToggle.addEventListener("click", () => {
+    const side = document.getElementById("side");
+    side.classList.toggle("minimized");
+    sideToggle.classList.toggle("active", !side.classList.contains("minimized"));
+  });
+
+  // RESTART — back to the singularity (t = 0): clock handled by the HUD,
+  // camera + realm handled here.
+  bus.on(EV.RESTART, () => {
+    realms.goto(0);
+    controls.setDist(220);
+    controls.setTarget(new THREE.Vector3(0, 0, 0));
+  });
+
   // Tab switching
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", () => {
@@ -172,10 +191,9 @@ async function boot() {
       bus.emit(EV.PICK, { ...hit });
       document.querySelector('.tab[data-tab="insp"]')?.click();
     } else if (isDouble) {
-      // cycle down a realm as fallback
-      const next = Math.min(realms.realmIndex + 1, REALMS.length - 1);
-      realms.goto(next);
-      controls.setDist([220, 60, 90, 3.2][next]);
+      // Double-click on empty space = zoom IN one step (was: realm switch,
+      // which felt like random zoom-out during exploration).
+      controls.zoomStep(1);
     }
     if (hit && !isDouble) {
       tooltip.style.display = "block";

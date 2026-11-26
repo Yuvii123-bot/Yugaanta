@@ -88,10 +88,18 @@ export class OrbitZoomControls {
   }
 
   zoomBy(dLog) {
+    // Any manual zoom cancels an in-flight camera animation so the
+    // user's zoom is never fought by an autopilot transition.
+    this._flyT = 1;
     this._targetDist = clamp(
       this._targetDist * Math.exp(-dLog),
       this.minDist, this.maxDist
     );
+  }
+
+  /** One discrete zoom step (double-click-to-zoom). +1 = in, -1 = out. */
+  zoomStep(direction = 1) {
+    this.zoomBy(direction * 1.1 * (this.invertZoom ? -1 : 1));
   }
 
   setBounds(min, max) {
