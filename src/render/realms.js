@@ -126,34 +126,37 @@ export class RealmManager {
     this.labels.update(this.controls.camera, camDist);
   }
 
-  // --- label provisioning (created once per realm) ---
+  // --- label provisioning (created once per realm, distance-gated so they
+  // --- never pile up on top of each other at the wrong zoom levels) ---
   _ensureLabelsUniverse(view) {
     if (this._uniLabels) return;
     this._uniLabels = [
-      this.labels.add(view.mwMarker, "Milky Way", { cls: "big" }),
-      this.labels.add(view.m31Marker, "Andromeda (M31)", { cls: "big" }),
-      this.labels.add(view.sunMarker, "The Sun — you are here", { cls: "" }),
+      this.labels.add(view.mwMarker, "Milky Way", { cls: "big", minDist: 8, maxDist: 395 }),
+      this.labels.add(view.m31Marker, "Andromeda (M31)", { cls: "big", minDist: 8, maxDist: 395 }),
+      this.labels.add(view.sunMarker, "The Sun — you are here", { cls: "", minDist: 2, maxDist: 60 }),
     ];
   }
   _ensureLabelsGalaxy(view) {
     if (this._galLabels) return;
     this._galLabels = [
-      this.labels.add(view.sunMesh, "The Sun", { cls: "big" }),
-      this.labels.add(view.bhMarker, "Sgr A* — 4.3M M☉ black hole", { cls: "dim" }),
+      this.labels.add(view.sunMesh, "The Sun", { cls: "big", minDist: 1.2, maxDist: 135 }),
+      this.labels.add(view.bhMarker, "Sgr A* — 4.3M M☉ black hole", { cls: "dim", minDist: 0.8, maxDist: 55 }),
     ];
   }
   _ensureLabelsSystem(view) {
     if (this._sysLabels) return;
     this._sysLabels = [];
     for (const { mesh, data } of view.planetMeshes.values()) {
-      this._sysLabels.push(this.labels.add(mesh, data.name, {}));
+      // inner planets get their labels only when close enough to be apart
+      const maxDist = data.a < 2 ? 60 : (data.a < 12 ? 150 : 420);
+      this._sysLabels.push(this.labels.add(mesh, data.name, { minDist: 0.07, maxDist }));
     }
-    this._sysLabels.push(this.labels.add(view.sun, "The Sun", { cls: "big" }));
+    this._sysLabels.push(this.labels.add(view.sun, "The Sun", { cls: "big", minDist: 0.3, maxDist: 240 }));
   }
   _ensureLabelsPlanet(view, body) {
     if (this._plLabels && this._plLabelsFor === body.id) return;
     if (this._plLabels) for (const l of this._plLabels) this.labels.remove(l);
-    this._plLabels = [this.labels.add(view.terrain, body.name, { cls: "big" })];
+    this._plLabels = [this.labels.add(view.terrain, body.name, { cls: "big", minDist: 1.03, maxDist: 5.8 })];
     this._plLabelsFor = body.id;
   }
 

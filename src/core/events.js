@@ -38,6 +38,7 @@ export const EV = {
   PARAMS_CHANGED: "params-changed",   // {params}
   REALM_CHANGED: "realm-changed",     // {realm}
   FOCUS_CHANGED: "focus-changed",     // {target}
+  RESTART: "restart",                 // {} — back to the singularity
   PICK: "pick",                       // {info}
   PARAMS_REBUILT: "params-rebuilt",   // {cosmo}
   LOADING_PROGRESS: "loading-progress", // {pct, msg}

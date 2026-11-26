@@ -83,10 +83,13 @@
   <!-- Bottom-left: view realm indicator + hints -->
   <div id="viewbox" class="panel">
     <div id="realm-name">OBSERVABLE UNIVERSE</div>
-    <div id="realm-hint">scroll = zoom through 46 billion light-years · drag = orbit · double-click = focus</div>
+    <div id="realm-hint">scroll = zoom through 46 billion light-years · drag = orbit · double-click = zoom in</div>
     <div class="btnrow" id="realm-buttons"></div>
     <label class="chk"><input type="checkbox" id="perf-mode" /> Performance mode (fewer particles)</label>
+    <label class="chk"><input type="checkbox" id="invert-zoom" /> Invert zoom &amp; swipe direction</label>
   </div>
+
+  <button id="side-toggle" title="Show / hide the side panels">◧ PANELS</button>
 
   <div id="labels"></div>
   <div id="tooltip"></div>
