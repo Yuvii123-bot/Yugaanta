@@ -1,0 +1,25 @@
+{
+  "name": "yugaanta",
+  "version": "1.0.0",
+  "description": "Yugaanta - real-time 3D universe simulation from the Big Bang to now and beyond, grounded in Lambda-CDM cosmology with a falsification lab to test (and try to break) the Big Bang theory.",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "python3 -m http.server 8080 --bind 0.0.0.0",
+    "test": "node --test"
+  },
+  "keywords": [
+    "universe",
+    "simulation",
+    "cosmology",
+    "big-bang",
+    "lcdm",
+    "threejs",
+    "physics",
+    "3d"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "three": "0.170.0"
+  }
+}
